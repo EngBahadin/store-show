@@ -30,7 +30,7 @@ export async function generateMetadata({
   const product = getProduct(slug);
   if (!product) return {};
 
-  const title = `${product.name} — RAVEN Erbil`;
+  const title = `${product.name} — RAVEN Sulaymaniyah`;
   const description = product.description[locale];
 
   return {

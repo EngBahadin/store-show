@@ -316,7 +316,7 @@ export function SellerDashboard({
                       alt={p.name}
                       fill
                       sizes="36px"
-                      className="object-cover"
+                      className="object-contain p-0.5"
                     />
                   </div>
                   <span className="flex-1 truncate font-medium text-foreground">

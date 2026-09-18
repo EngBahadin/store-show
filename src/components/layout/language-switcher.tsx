@@ -19,11 +19,20 @@ import {
 import { locales, type Locale } from "@/lib/i18n/config";
 import { useI18n } from "@/lib/i18n/provider";
 
-export function LanguageSwitcher({ className = "" }: { className?: string }) {
+export function LanguageSwitcher({
+  className = "",
+  showIcon = true,
+}: {
+  className?: string;
+  /** Set false to drop the globe icon and show just the language code (used in the nav bar). */
+  showIcon?: boolean;
+}) {
   const { locale, t } = useI18n();
   const pathname = usePathname();
   const router = useRouter();
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  const code = locale === "ku" ? "KU" : locale === "ar" ? "AR" : "EN";
 
   const switchLocale = (targetLocale: Locale) => {
     if (targetLocale === locale) {
@@ -66,10 +75,8 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
           aria-label="Change language"
           className={`h-9 px-2.5 rounded-full flex items-center gap-1.5 border border-border text-foreground hover:bg-secondary text-xs font-semibold transition-colors ${className}`}
         >
-          <Globe className="w-3.5 h-3.5" />
-          <span>
-            {locale === "ku" ? "کوردی" : locale === "ar" ? "عربي" : "EN"}
-          </span>
+          {showIcon && <Globe className="w-3.5 h-3.5" />}
+          <span>{showIcon ? (locale === "ku" ? "کوردی" : locale === "ar" ? "عربي" : "EN") : code}</span>
         </button>
 
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -118,10 +125,8 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
             className={`h-9 px-3 rounded-full flex items-center gap-1.5 border border-border text-foreground hover:bg-secondary text-xs font-semibold transition-colors focus:outline-none focus:ring-1 focus:ring-ring ${className}`}
             aria-label="Change language"
           >
-            <Globe className="w-3.5 h-3.5 text-muted-foreground" />
-            <span>
-              {locale === "ku" ? "کوردی" : locale === "ar" ? "عربي" : "English"}
-            </span>
+            {showIcon && <Globe className="w-3.5 h-3.5 text-muted-foreground" />}
+            <span>{showIcon ? (locale === "ku" ? "کوردی" : locale === "ar" ? "عربي" : "English") : code}</span>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent

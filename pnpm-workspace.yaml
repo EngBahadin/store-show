@@ -1,0 +1,4 @@
+# unrs-resolver ships a prebuilt native binary and needs its install script to
+# run; it backs the TypeScript import resolver that eslint-config-next uses.
+allowBuilds:
+  unrs-resolver: true

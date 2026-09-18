@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Toaster } from "sonner";
 
-import { FloatingWhatsApp } from "@/components/common/floating-whatsapp";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { CartSheet } from "@/components/commerce/cart-sheet";
 import { DirLangUpdater } from "@/components/layout/dir-lang-updater";
@@ -32,10 +31,10 @@ export async function generateMetadata({
   const title = `RAVEN — ${site.tagline[locale]}`;
   const description =
     locale === "ku"
-      ? "پێڵاوی ڕەسەن، هۆکا، جۆردان، نایکی، ئەدیداس و سکێچەرز لە هەولێر."
+      ? "پێڵاوی ڕەسەن، هۆکا، جۆردان، نایکی، ئەدیداس و سکێچەرز لە سلێمانی."
       : locale === "ar"
-        ? "أحذية أصلية، هوكا، جوردان، نايكي، أديداس وسكيتشرز في أربيل."
-        : "Authentic sneakers — Hoka, Jordan, Nike, Adidas & Skechers in Erbil.";
+        ? "أحذية أصلية، هوكا، جوردان، نايكي، أديداس وسكيتشرز في السليمانية."
+        : "Authentic sneakers — Hoka, Jordan, Nike, Adidas & Skechers in Sulaymaniyah.";
 
   return {
     metadataBase: new URL(site.url),
@@ -86,6 +85,7 @@ export default async function LocaleLayout({
       attribute="class"
       defaultTheme="dark"
       enableSystem={false}
+      disableTransitionOnChange
     >
       <I18nProvider locale={locale}>
         <CartProvider>
@@ -93,12 +93,11 @@ export default async function LocaleLayout({
             <RecentlyViewedProvider>
               <SellerProvider>
                 <DirLangUpdater locale={locale} />
-                <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-200">
+                <div className="flex flex-col min-h-screen bg-background text-foreground">
                   <SiteHeader />
                   <main className="flex-1 w-full">{children}</main>
                   <BottomNav />
                   <CartSheet />
-                  <FloatingWhatsApp />
                   <SiteFooter />
                   <Toaster position="top-center" richColors />
                 </div>

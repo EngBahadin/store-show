@@ -4,8 +4,8 @@ import { Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { isNewArrival, type Product } from "@/data/products";
-import { discountPercent, formatPrice } from "@/lib/format";
+import { getBlur, isLifestylePhoto, type Product } from "@/data/products";
+import { discountPercent, formatPrice, formatSize } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/provider";
 import { useWishlist } from "@/lib/store/wishlist";
 
@@ -20,25 +20,33 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 
   const isFavorited = has(product.slug);
   const currency = locale === "en" ? "IQD" : "د.ع";
+  const isLifestyle = isLifestylePhoto(product);
+  const blur = getBlur(product.slug);
 
   const isSoldOut =
     product.stock === 0 ||
     (product.soldOutSizes &&
       product.soldOutSizes.length >= product.sizes.length);
 
-  const isNew = isNewArrival(product);
-
   const discount =
     product.compareAt && product.compareAt > product.price
-      ? discountPercent(product.compareAt, product.price)
+      ? discountPercent(product.price, product.compareAt)
       : null;
+
+  // Most of the catalogue is one physical pair, not a size run — when only
+  // one size is actually left, surface it on the card itself so the buyer
+  // doesn't have to open the product just to find out it isn't their size.
+  const availableSizes = product.sizes.filter(
+    (s) => !(product.soldOutSizes || []).includes(s),
+  );
+  const onlySize = availableSizes.length === 1 ? availableSizes[0] : null;
 
   return (
     <div className="group relative flex flex-col gap-2">
       {/* Image container */}
       <Link
         href={href(`/product/${product.slug}`)}
-        className="relative w-full aspect-[3/4] bg-secondary rounded-xl border border-border overflow-hidden block shadow-xs"
+        className="relative w-full aspect-square bg-white dark:bg-card rounded-xl border border-border/80 overflow-hidden block shadow-xs"
       >
         <Image
           src={`/products/${product.slug}.webp`}
@@ -46,23 +54,26 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           priority={priority}
-          className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
+          placeholder={blur ? "blur" : "empty"}
+          blurDataURL={blur}
+          className={`${
+            isLifestyle
+              ? "object-cover object-center"
+              : "object-contain p-3 sm:p-4"
+          } transition-transform duration-300 group-hover:scale-105 ${
             isSoldOut ? "opacity-40" : ""
           }`}
         />
 
-        {/* Badges */}
+        {/* Discount is the only badge: almost everything in the catalogue falls
+            inside the freshness window, so a "new" badge marked nearly every
+            card and stopped meaning anything. */}
         <div className="absolute top-2.5 start-2.5 flex flex-col gap-1.5 z-10">
-          {isNew && !isSoldOut && (
-            <span className="bg-primary text-primary-foreground text-[9px] font-bold px-2 py-0.5 rounded-full shadow-xs">
-              {locale === "ku" ? "نوێ" : locale === "ar" ? "جديد" : "NEW"}
-            </span>
-          )}
-          {discount && !isSoldOut && (
+          {discount && !isSoldOut ? (
             <span className="bg-[#E01B24] text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-xs">
               {`-${discount}%`}
             </span>
-          )}
+          ) : null}
         </div>
 
         {/* Sold out overlay */}
@@ -97,12 +108,28 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 
       {/* Details */}
       <div className="flex flex-col gap-1 px-0.5">
-        <Link
-          href={href(`/product/${product.slug}`)}
-          className="text-xs sm:text-[13px] text-foreground font-medium line-clamp-2 leading-snug hover:underline transition-colors"
-        >
-          {product.name}
-        </Link>
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Link
+            href={href(`/product/${product.slug}`)}
+            className={`text-xs sm:text-[13px] text-foreground font-medium leading-snug hover:underline transition-colors min-w-0 ${
+              onlySize ? "truncate" : "line-clamp-2"
+            }`}
+          >
+            {product.name}
+          </Link>
+
+          {/* Last size left — beside the name so it doesn't cost the card an
+              extra row; only shown when it's the single deciding factor. */}
+          {onlySize && !isSoldOut && (
+            <span className="shrink-0 whitespace-nowrap text-[9px] sm:text-[10px] font-bold text-[#E01B24] bg-[#E01B24]/10 px-1.5 py-0.5 rounded-full">
+              {locale === "ku"
+                ? `تەنها ${formatSize(onlySize)}`
+                : locale === "ar"
+                  ? `${formatSize(onlySize)} فقط`
+                  : `Only ${formatSize(onlySize)}`}
+            </span>
+          )}
+        </div>
 
         {/* Pricing */}
         {product.price === 0 ? (

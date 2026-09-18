@@ -2,7 +2,13 @@
  * Asset pipeline. Run with `npm run prep:assets` after dropping new photos
  * into public/products (any jpg/png/webp/avif).
  *
- *  - products : re-encoded to .webp, long edge capped at 1600px
+ *  - products : re-encoded to .webp, long edge capped at 1600px.
+ *               A source narrower than MIN_LONG_EDGE is upscaled with a
+ *               Lanczos resample + a mild sharpen pass, instead of being
+ *               left at its native size — a plain browser stretch of a
+ *               ~200px photo to fill a product card or the detail page is
+ *               what makes it look soft in the first place. This narrows
+ *               that gap but is not a substitute for a bigger source photo.
  *  - brand    : white-on-black JPG logos -> transparent PNGs (white + black ink)
  *  - output   : src/data/blur.json, a slug -> base64 LQIP map used by <Shoe />
  *
@@ -16,6 +22,9 @@ const ROOT = path.resolve(import.meta.dirname, "..");
 const PRODUCTS = path.join(ROOT, "public/products");
 const BRAND = path.join(ROOT, "public/brand");
 const SOURCE = /\.(jpe?g|png|avif)$/i;
+
+const MIN_LONG_EDGE = 960;
+const MAX_LONG_EDGE = 1600;
 
 /** White-on-black artwork -> RGBA where alpha is the source luminance. */
 async function inkFromLuminance(src, out, size, ink) {
@@ -100,14 +109,34 @@ async function main() {
     const slug = file.replace(SOURCE, "");
     const src = path.join(PRODUCTS, file);
 
-    await sharp(src)
-      .resize(1600, 1600, { fit: "inside", withoutEnlargement: true })
-      .webp({ quality: 82 })
+    const meta = await sharp(src).metadata();
+    const longEdge = Math.max(meta.width ?? 0, meta.height ?? 0);
+    const isLowRes = longEdge > 0 && longEdge < MIN_LONG_EDGE;
+
+    const pipeline = isLowRes
+      ? sharp(src)
+          .resize(MIN_LONG_EDGE, MIN_LONG_EDGE, {
+            fit: "inside",
+            kernel: "lanczos3",
+          })
+          .sharpen({ sigma: 1.1, m1: 0.6, m2: 0.3 })
+      : sharp(src).resize(MAX_LONG_EDGE, MAX_LONG_EDGE, {
+          fit: "inside",
+          withoutEnlargement: true,
+        });
+
+    await pipeline
+      .webp({ quality: isLowRes ? 85 : 82 })
       .toFile(path.join(PRODUCTS, `${slug}.webp`));
 
     const lqip = await sharp(src).resize(16).webp({ quality: 30 }).toBuffer();
     blur[slug] = `data:image/webp;base64,${lqip.toString("base64")}`;
-    console.log(`product  ${slug}.webp`);
+
+    console.log(
+      isLowRes
+        ? `product  ${slug}.webp — source is only ${longEdge}px, upscaled to ${MIN_LONG_EDGE}px. Drop in a bigger photo at the same path and re-run when you can.`
+        : `product  ${slug}.webp`,
+    );
   }
 
   await writeFile(

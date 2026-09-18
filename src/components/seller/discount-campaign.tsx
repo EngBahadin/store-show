@@ -257,12 +257,12 @@ export function DiscountCampaignModal({
                     key={p.slug}
                     className="flex-none w-28 space-y-1"
                   >
-                    <div className="relative w-full aspect-[4/5] rounded-lg overflow-hidden border border-[#262626] bg-[#141414]">
+                    <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-[#262626] bg-[#141414]">
                       <Image
                         src={`/products/${p.slug}.webp`}
                         alt={p.name}
                         fill
-                        className="object-cover"
+                        className="object-contain p-1.5"
                       />
                       <span className="absolute top-1.5 end-1.5 bg-[#E01B24] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
                         {percentage}%

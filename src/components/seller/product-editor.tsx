@@ -206,7 +206,7 @@ function ProductEditorForm({
                 src={`/products/${selectedImage}.webp`}
                 alt="Product"
                 fill
-                className="object-cover"
+                className="object-contain p-2"
               />
               <button
                 type="button"

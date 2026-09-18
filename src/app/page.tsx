@@ -39,7 +39,7 @@ export default function RootPage() {
       <h1 className="text-xl font-extrabold tracking-widest uppercase font-mono">
         RAVEN
       </h1>
-      <p className="text-xs text-[#8A8A8A] mt-1">Erbil · Kurdistan Region</p>
+      <p className="text-xs text-[#8A8A8A] mt-1">Sulaymaniyah · Kurdistan Region</p>
 
       {/* No-JS fallback */}
       <noscript className="mt-8 block">

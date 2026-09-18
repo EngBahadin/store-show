@@ -53,7 +53,7 @@ export default function AdminPage() {
                   : "Seller Command Center"}
             </h1>
             <p className="text-[11px] text-muted-foreground">
-              RAVEN Store Erbil · Live Catalog & Stats
+              RAVEN Store Sulaymaniyah · Live Catalog & Stats
             </p>
           </div>
         </div>

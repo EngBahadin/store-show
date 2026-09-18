@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { WhatsAppIcon } from "@/components/common/floating-whatsapp";
-import { getProduct } from "@/data/products";
+import { getProduct, isLifestylePhoto } from "@/data/products";
 import { formatPrice, formatSize } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/provider";
 import { site } from "@/lib/site";
@@ -93,7 +93,7 @@ export default function CartPage() {
           <p className="text-xs text-muted-foreground leading-relaxed max-w-xs mx-auto">
             {locale === "ku"
               ? "سەیری پێڵاوەکانمان بکە و دانەیەک هەڵبژێرە."
-              : "Discover authentic sneakers directly from Erbil shelves."}
+              : "Discover authentic sneakers directly from Sulaymaniyah shelves."}
           </p>
           <div className="pt-2">
             <Link
@@ -121,14 +121,18 @@ export default function CartPage() {
                   >
                     <Link
                       href={href(`/product/${p.slug}`)}
-                      className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border border-border bg-secondary shrink-0 group"
+                      className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border border-border/80 bg-white dark:bg-card shrink-0 group shadow-2xs"
                     >
                       <Image
                         src={`/products/${p.slug}.webp`}
                         alt={p.name}
                         fill
                         sizes="96px"
-                        className="object-cover transition-transform group-hover:scale-105"
+                        className={`${
+                          isLifestylePhoto(p)
+                            ? "object-cover object-center"
+                            : "object-contain p-2"
+                        } transition-transform group-hover:scale-105`}
                       />
                     </Link>
 
@@ -280,7 +284,7 @@ export default function CartPage() {
               <p className="text-[10px] text-center text-muted-foreground">
                 {locale === "ku"
                   ? "داواکارییەکەت ڕاستەوخۆ دەگاتە تیمی پشتیوانی فرۆشگا لە واتسئاپ"
-                  : "Your order details will be sent directly to our Erbil WhatsApp support team."}
+                  : "Your order details will be sent directly to our Sulaymaniyah WhatsApp support team."}
               </p>
             </div>
           </div>

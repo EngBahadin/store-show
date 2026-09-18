@@ -190,7 +190,7 @@ export function InventoryManager({
                     alt={product.name}
                     fill
                     sizes="56px"
-                    className="object-cover"
+                    className="object-contain p-1"
                   />
                 </div>
 

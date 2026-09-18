@@ -41,10 +41,10 @@ export default function InfoPage() {
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {locale === "ku"
-                ? "ڕەیڤن یەکەم فرۆشگای پێڵاوی ئەسڵی و کاتییە لە هەولێر. ئێمە هەموو پێڵاوێک بە شێوەیەکی ڕاستەوخۆ لە ڕەفەکانەوە پێشکەش دەکەین."
+                ? "ڕەیڤن یەکەم فرۆشگای پێڵاوی ئەسڵی و کاتییە لە سلێمانی. ئێمە هەموو پێڵاوێک بە شێوەیەکی ڕاستەوخۆ لە ڕەفەکانەوە پێشکەش دەکەین."
                 : locale === "ar"
-                  ? "رايفن هو وجهتك الأولى للأحذية الأصلية والحصرية في أربيل، مباشرة من الرفوف مع ضمان الأصالة 100%."
-                  : "RAVEN is your premier destination for 100% authentic sneakers directly from retail shelves in Erbil, Kurdistan Region."}
+                  ? "رايفن هو وجهتك الأولى للأحذية الأصلية والحصرية في السليمانية، مباشرة من الرفوف مع ضمان الأصالة 100%."
+                  : "RAVEN is your premier destination for 100% authentic sneakers directly from retail shelves in Sulaymaniyah, Kurdistan Region."}
             </p>
 
             <div className="pt-2 border-t border-border flex justify-around text-start">
@@ -53,7 +53,11 @@ export default function InfoPage() {
                   {locale === "ku" ? "شار" : "City"}
                 </span>
                 <p className="text-xs font-bold text-foreground">
-                  {locale === "ku" ? "هەولێر، کوردستان" : "Erbil, Kurdistan"}
+                  {locale === "ku"
+                    ? "سلێمانی، کوردستان"
+                    : locale === "ar"
+                      ? "السليمانية، كردستان"
+                      : "Sulaymaniyah, Kurdistan"}
                 </p>
               </div>
               <div className="space-y-0.5">

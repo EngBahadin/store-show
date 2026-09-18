@@ -11,7 +11,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { getProduct } from "@/data/products";
+import { getProduct, isLifestylePhoto } from "@/data/products";
 import { formatPrice, formatSize } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/provider";
 import { site } from "@/lib/site";
@@ -154,14 +154,18 @@ export function CartSheet() {
                   <Link
                     href={href(`/product/${p.slug}`)}
                     onClick={() => setIsOpen(false)}
-                    className="relative w-16 h-16 rounded-lg overflow-hidden border border-border bg-secondary shrink-0 shadow-xs"
+                    className="relative w-16 h-16 rounded-lg overflow-hidden border border-border/80 bg-white dark:bg-card shrink-0 shadow-xs"
                   >
                     <Image
                       src={`/products/${p.slug}.webp`}
                       alt={p.name}
                       fill
                       sizes="64px"
-                      className="object-cover"
+                      className={
+                        isLifestylePhoto(p)
+                          ? "object-cover object-center"
+                          : "object-contain p-1.5"
+                      }
                     />
                   </Link>
 

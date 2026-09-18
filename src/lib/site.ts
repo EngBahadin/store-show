@@ -22,12 +22,12 @@ export const site = {
   instagram: "raven.iq",
 
   address: {
-    en: "Erbil, Kurdistan Region, Iraq",
-    ku: "هەولێر، هەرێمی کوردستان، عێراق",
-    ar: "أربيل، إقليم كردستان، العراق",
+    en: "Sulaymaniyah, Kurdistan Region, Iraq",
+    ku: "سلێمانی، هەرێمی کوردستان، عێراق",
+    ar: "السليمانية، إقليم كردستان، العراق",
   },
   /** Google Maps place link for the "Get directions" button. */
-  maps: "https://maps.google.com/?q=Erbil",
+  maps: "https://maps.google.com/?q=Sulaymaniyah",
 
   hours: {
     en: "Every day · 10:00 — 23:00",

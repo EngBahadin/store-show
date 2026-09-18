@@ -1,9 +1,10 @@
 "use client";
 
-import { Flame, Search, SlidersHorizontal, X } from "lucide-react";
+import { Flame, Search, SlidersHorizontal, User, X } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
 
+import { BrandMark, brandMarkKind } from "@/components/brand/brand-mark";
 import { EmptyState } from "@/components/commerce/empty-state";
 import { ProductCard } from "@/components/commerce/product-card";
 import { SortSheet, type SortOption } from "@/components/commerce/sort-sheet";
@@ -178,44 +179,82 @@ function ShopContent() {
       {/* Gender & Brand Secondary Filters */}
       <div className="flex flex-wrap gap-2 text-xs">
         {/* Gender Chips */}
-        {(["men", "women"] as const).map((g) => (
-          <button
-            key={g}
-            onClick={() =>
-              setSelectedGender(selectedGender === g ? "all" : g)
-            }
-            className={`px-3 py-1 rounded-md border text-[11px] font-medium transition-colors cursor-pointer ${
-              selectedGender === g
-                ? "border-primary bg-primary text-primary-foreground font-bold shadow-xs"
-                : "border-border bg-card text-muted-foreground hover:border-foreground/40 hover:text-foreground"
-            }`}
-          >
-            {g === "men"
+        {(["men", "women"] as const).map((g) => {
+          const label =
+            g === "men"
               ? locale === "ku"
                 ? "پیاوان"
-                : "Men"
+                : locale === "ar"
+                  ? "رجال"
+                  : "Men"
               : locale === "ku"
                 ? "ژنان"
-                : "Women"}
-          </button>
-        ))}
+                : locale === "ar"
+                  ? "نساء"
+                  : "Women";
+          return (
+            <button
+              key={g}
+              onClick={() =>
+                setSelectedGender(selectedGender === g ? "all" : g)
+              }
+              title={label}
+              aria-pressed={selectedGender === g}
+              className={`flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-[11px] font-medium transition-colors cursor-pointer ${
+                selectedGender === g
+                  ? g === "men"
+                    ? "border-blue-600 bg-blue-600 text-white font-bold shadow-xs"
+                    : "border-pink-600 bg-pink-600 text-white font-bold shadow-xs"
+                  : g === "men"
+                    ? "border-blue-500/50 bg-card text-blue-600 dark:text-blue-400 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30"
+                    : "border-pink-500/50 bg-card text-pink-600 dark:text-pink-400 hover:border-pink-500 hover:bg-pink-50 dark:hover:bg-pink-950/30"
+              }`}
+            >
+              <User className="size-3.5" />
+              <span>{label}</span>
+            </button>
+          );
+        })}
 
         {/* Brands Dropdown/Chips */}
-        {brands.slice(0, 5).map((b) => (
-          <button
-            key={b.id}
-            onClick={() =>
-              setSelectedBrand(selectedBrand === b.id ? "all" : b.id)
-            }
-            className={`px-3 py-1 rounded-md border text-[11px] font-medium transition-colors cursor-pointer ${
-              selectedBrand === b.id
-                ? "border-primary bg-primary text-primary-foreground font-bold shadow-xs"
-                : "border-border bg-card text-muted-foreground hover:border-foreground/40 hover:text-foreground"
-            }`}
-          >
-            {b.name}
-          </button>
-        ))}
+        {brands.slice(0, 5).map((b) => {
+          const kind = brandMarkKind(b.id);
+          return (
+            <button
+              key={b.id}
+              onClick={() =>
+                setSelectedBrand(selectedBrand === b.id ? "all" : b.id)
+              }
+              title={b.name}
+              aria-pressed={selectedBrand === b.id}
+              className={`flex h-8 items-center justify-center rounded-md border text-[11px] font-medium transition-colors cursor-pointer ${
+                kind === "path" ? "w-14" : kind === "image" ? "px-2" : "px-3"
+              } ${
+                selectedBrand === b.id
+                  ? "border-primary bg-primary text-primary-foreground font-bold shadow-xs"
+                  : "border-border bg-card text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+              }`}
+            >
+              {/* nike/adidas/jordan render as a monochrome icon mark that
+                  follows the chip's own colour. hoka/skechers only exist as
+                  full-colour wordmark artwork, so they render on a small
+                  white plate that keeps the brand's real ink colour legible
+                  against the storefront's dark theme. Anything without
+                  artwork falls back to its plain name. */}
+              {kind ? (
+                <>
+                  <BrandMark
+                    brand={b.id}
+                    className={kind === "path" ? "size-6" : "h-5"}
+                  />
+                  <span className="sr-only">{b.name}</span>
+                </>
+              ) : (
+                b.name
+              )}
+            </button>
+          );
+        })}
 
         {hasActiveFilters && (
           <button

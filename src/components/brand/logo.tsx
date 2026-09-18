@@ -19,41 +19,41 @@ export function Logo({
   const content = (
     <div className={`inline-flex items-center select-none ${className}`}>
       {isWordmark ? (
-        <div className="relative h-9 w-28 sm:h-11 sm:w-36 transition-opacity hover:opacity-90">
+        <div className="relative flex items-center transition-opacity hover:opacity-90">
           <Image
             src="/brand/raven-wordmark-black.png"
             alt="RAVEN"
-            fill
-            sizes="144px"
+            width={870}
+            height={331}
             priority={priority}
-            className="object-contain block dark:hidden"
+            className="h-6 sm:h-7 w-auto object-contain block dark:hidden shrink-0"
           />
           <Image
             src="/brand/raven-wordmark-white.png"
             alt="RAVEN"
-            fill
-            sizes="144px"
+            width={870}
+            height={331}
             priority={priority}
-            className="object-contain hidden dark:block"
+            className="h-6 sm:h-7 w-auto object-contain hidden dark:block shrink-0"
           />
         </div>
       ) : (
-        <div className="relative h-8 w-8 sm:h-10 sm:w-10 transition-opacity hover:opacity-90">
+        <div className="relative flex items-center transition-opacity hover:opacity-90">
           <Image
             src="/brand/raven-mark-black.png"
             alt="RAVEN"
-            fill
-            sizes="40px"
+            width={237}
+            height={353}
             priority={priority}
-            className="object-contain block dark:hidden"
+            className="h-6 sm:h-7 w-auto object-contain block dark:hidden shrink-0"
           />
           <Image
             src="/brand/raven-mark-white.png"
             alt="RAVEN"
-            fill
-            sizes="40px"
+            width={237}
+            height={353}
             priority={priority}
-            className="object-contain hidden dark:block"
+            className="h-6 sm:h-7 w-auto object-contain hidden dark:block shrink-0"
           />
         </div>
       )}

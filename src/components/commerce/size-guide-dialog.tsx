@@ -87,7 +87,7 @@ export function SizeGuideDialog({ open, onOpenChange }: SizeGuideDialogProps) {
           >
             <div className="w-10 h-1 bg-border rounded-full mx-auto mt-3.5 mb-2" />
             <SheetHeader className="px-5 pb-3 text-start">
-              <div className="flex items-baseline justify-between">
+              <div className="flex items-baseline justify-between pe-6">
                 <SheetTitle className="text-base font-bold text-foreground">
                   {locale === "ku"
                     ? "ڕێنمایی قەبارە"

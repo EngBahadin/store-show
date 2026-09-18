@@ -1,7 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Cairo:wght@600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700;800&display=swap');
+/* The actual font stylesheet is a real <link rel="stylesheet"> in
+   src/app/layout.tsx's <head>, not an @import here. @import is discovered
+   only after the browser downloads and parses this file down to this line,
+   which is exactly the kind of late, render-blocking fetch that produces a
+   flash of a fallback system font before the intended one swaps in — the
+   "different font" inconsistency this file's language rules otherwise fix. */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+
+/* Self-hosted Kurdish brand font — not on Google Fonts, so it's a local
+   file under public/fonts rather than the <link> in layout.tsx. Only the
+   Regular weight is available; heavier weights fall back to the browser's
+   synthetic bold rather than a second, unavailable face. */
+@font-face {
+  font-family: "NRT";
+  src: url("/fonts/NRT-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -107,9 +124,9 @@
 .dark {
   --background: #050505;
   --foreground: #FFFFFF;
-  --card: #0A0A0A;
+  --card: #171717;
   --card-foreground: #FFFFFF;
-  --popover: #0A0A0A;
+  --popover: #171717;
   --popover-foreground: #FFFFFF;
 
   /* Dark mode leads with the red accent and pure streetwear contrast */
@@ -143,13 +160,17 @@
   --sidebar-ring: #E01B24;
 }
 
-/* Specific curated typography per language */
+/* Specific curated typography per language. Kurdish uses one single font —
+   NRT, the brand's chosen Kurdish typeface — for both headings and body, so
+   nothing on the site can drift to a different-looking font than the rest:
+   whatever renders on one Kurdish page renders everywhere. Vazirmatn/Noto
+   stay as fallbacks for the rare glyph NRT doesn't cover. */
 :root[lang="ckb"],
 [lang="ckb"],
 :root[lang="ku"],
 [lang="ku"] {
-  --font-display: "Noto Kufi Arabic", "Vazirmatn", system-ui, sans-serif;
-  --font-body: "Vazirmatn", "Noto Sans Arabic", "Noto Kufi Arabic", system-ui, sans-serif;
+  --font-display: "NRT", "Vazirmatn", "Noto Sans Arabic", "Noto Kufi Arabic", system-ui, sans-serif;
+  --font-body: "NRT", "Vazirmatn", "Noto Sans Arabic", "Noto Kufi Arabic", system-ui, sans-serif;
 }
 
 :root[lang="ar"],
@@ -190,29 +211,26 @@
   :where([dir="rtl"]),
   :where([lang="ckb"]),
   :where([lang="ku"]) {
-    font-family: "Vazirmatn", "Noto Sans Arabic", "Noto Kufi Arabic", sans-serif;
+    font-family: "NRT", "Vazirmatn", "Noto Sans Arabic", "Noto Kufi Arabic", sans-serif;
   }
 
   :where([dir="rtl"]) body,
   :where([lang="ckb"]) body,
   :where([lang="ku"]) body {
-    font-family: "Vazirmatn", "Noto Sans Arabic", "Noto Kufi Arabic", sans-serif;
+    font-family: "NRT", "Vazirmatn", "Noto Sans Arabic", "Noto Kufi Arabic", sans-serif;
     letter-spacing: normal;
     font-size: 1.02em;
     line-height: 1.625;
   }
 
-  :where([dir="rtl"]) :is(h1, h2, h3, h4, h5, h6, .font-heading, [data-slot="dialog-title"], [data-slot="sheet-title"]),
-  :where([lang="ckb"]) :is(h1, h2, h3, h4, h5, h6, .font-heading, [data-slot="dialog-title"], [data-slot="sheet-title"]),
-  :where([lang="ku"]) :is(h1, h2, h3, h4, h5, h6, .font-heading, [data-slot="dialog-title"], [data-slot="sheet-title"]) {
-    font-family: "Noto Kufi Arabic", "Vazirmatn", sans-serif !important;
-    letter-spacing: normal;
-  }
+  /* Kurdish headings intentionally have no override here: they inherit the
+     same NRT stack as body text above, so the whole language is one
+     consistent font rather than a different one for titles vs paragraphs. */
 
   :where([dir="rtl"]) :is(input, button, select, textarea, p, span, a, label),
   :where([lang="ckb"]) :is(input, button, select, textarea, p, span, a, label),
   :where([lang="ku"]) :is(input, button, select, textarea, p, span, a, label) {
-    font-family: "Vazirmatn", "Noto Sans Arabic", "Noto Kufi Arabic", sans-serif;
+    font-family: "NRT", "Vazirmatn", "Noto Sans Arabic", "Noto Kufi Arabic", sans-serif;
   }
 
   /* Explicit Arabic typography */

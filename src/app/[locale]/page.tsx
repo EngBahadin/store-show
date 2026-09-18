@@ -1,37 +1,40 @@
 "use client";
 
-import { Search, SlidersHorizontal, Sparkles } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { Flame, SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { WhatsAppIcon } from "@/components/common/floating-whatsapp";
-import { NewArrivalsCarousel } from "@/components/commerce/new-arrivals-carousel";
 import { ProductCard } from "@/components/commerce/product-card";
+import { PromoCarousel } from "@/components/commerce/promo-carousel";
 import { SortSheet, type SortOption } from "@/components/commerce/sort-sheet";
-import { allProducts, newArrivals as getNewArrivals } from "@/data/products";
+import { allProducts } from "@/data/products";
 import { useI18n } from "@/lib/i18n/provider";
-import { buildContactWhatsAppUrl } from "@/lib/whatsapp";
+
+type FilterTab = "all" | "men" | "women" | "running" | "lifestyle" | "sale";
 
 export default function StorefrontPage() {
-  const { href, locale } = useI18n();
+  const { locale } = useI18n();
 
   const [sortOpen, setSortOpen] = useState(false);
   const [currentSort, setCurrentSort] = useState<SortOption>("newest");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState<FilterTab>("all");
 
   const rawProducts = allProducts();
-  const newArrivalList = useMemo(() => getNewArrivals().slice(0, 6), []);
 
-  const sortedProducts = useMemo(() => {
-    const list = [...rawProducts];
-    if (searchQuery.trim()) {
-      return list.filter(
-        (p) =>
-          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.code.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
+  const filteredProducts = useMemo(() => {
+    let list = [...rawProducts];
+
+    if (filter === "men") {
+      list = list.filter((p) => p.gender === "men" || p.gender === "unisex");
+    } else if (filter === "women") {
+      list = list.filter((p) => p.gender === "women" || p.gender === "unisex");
+    } else if (filter === "running") {
+      list = list.filter((p) => p.category === "running");
+    } else if (filter === "lifestyle") {
+      list = list.filter((p) => p.category === "lifestyle");
+    } else if (filter === "sale") {
+      list = list.filter((p) => p.compareAt && p.compareAt > p.price);
     }
+
     switch (currentSort) {
       case "price-asc":
         return list.sort((a, b) => (a.price || 999999) - (b.price || 999999));
@@ -46,182 +49,90 @@ export default function StorefrontPage() {
             new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime(),
         );
     }
-  }, [rawProducts, currentSort, searchQuery]);
+  }, [rawProducts, currentSort, filter]);
 
-  const whatsappContactUrl = buildContactWhatsAppUrl(locale);
+  const filterTabs: { id: FilterTab; label: string; isSale?: boolean }[] = [
+    { id: "all", label: locale === "ku" ? "هەموو" : locale === "ar" ? "الكل" : "All" },
+    { id: "men", label: locale === "ku" ? "پیاوان" : locale === "ar" ? "رجال" : "Men" },
+    { id: "women", label: locale === "ku" ? "ژنان" : locale === "ar" ? "نساء" : "Women" },
+    { id: "running", label: locale === "ku" ? "ڕاکردن" : locale === "ar" ? "جري" : "Running" },
+    { id: "lifestyle", label: locale === "ku" ? "شێوازی ژیان" : locale === "ar" ? "لايف ستايل" : "Lifestyle" },
+    { id: "sale", label: locale === "ku" ? "داشکاندن" : locale === "ar" ? "تخفيضات" : "Sale", isSale: true },
+  ];
+
+  // Men/Women get their own brand colour (blue / pink) instead of the
+  // generic primary accent; every other tab keeps the default styling.
+  const tabClassName = (tab: (typeof filterTabs)[number]) => {
+    const active = filter === tab.id;
+    if (tab.isSale) {
+      return active
+        ? "bg-[#E01B24] text-white shadow-xs"
+        : "border border-[#E01B24]/40 text-[#E01B24] hover:bg-[#E01B24]/10";
+    }
+    if (tab.id === "men") {
+      return active
+        ? "bg-blue-600 text-white border border-blue-600 shadow-xs"
+        : "border border-blue-500/50 bg-card text-blue-600 dark:text-blue-400 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30";
+    }
+    if (tab.id === "women") {
+      return active
+        ? "bg-pink-600 text-white border border-pink-600 shadow-xs"
+        : "border border-pink-500/50 bg-card text-pink-600 dark:text-pink-400 hover:border-pink-500 hover:bg-pink-50 dark:hover:bg-pink-950/30";
+    }
+    return active
+      ? "bg-primary text-primary-foreground border border-primary shadow-xs"
+      : "border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-secondary";
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-6">
-      {/* 1. Search Bar (Screen 01) */}
-      <div className="relative">
-        <div className="flex items-center gap-2.5 bg-card border border-border rounded-full px-4 h-12 shadow-xs transition-colors">
-          <Search className="w-4 h-4 text-muted-foreground shrink-0" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={
-              locale === "ku"
-                ? "گەڕان بۆ هۆکا، جۆردان، نایکی، ئەدیداس..."
-                : locale === "ar"
-                  ? "ابحث عن هوكا، جوردان، نايكي، أديداس..."
-                  : "Search for Hoka, Jordan, Nike, Adidas..."
-            }
-            className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
-          />
-        </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-5">
+      <PromoCarousel />
+
+      {/* Category Filter Chips */}
+      <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+        {filterTabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setFilter(tab.id)}
+            className={`flex-none px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${tabClassName(tab)}`}
+          >
+            {tab.isSale && <Flame className="w-3.5 h-3.5" />}
+            <span>{tab.label}</span>
+          </button>
+        ))}
       </div>
 
-      {/* 2. Category Cards Grid (Responsive: 2 cols on mobile, 4 cols on tablet/desktop) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
-        {/* Men */}
-        <Link
-          href={href("/shop?gender=men")}
-          className="relative h-[92px] sm:h-[120px] md:h-[140px] lg:h-[160px] rounded-xl sm:rounded-2xl overflow-hidden border border-border group block shadow-xs"
-        >
-          <Image
-            src="/products/adidas-x9000-l4-black-red.webp"
-            alt="Men"
-            fill
-            sizes="(max-width: 640px) 50vw, 25vw"
-            className="object-cover opacity-60 dark:opacity-55 transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-          <span className="absolute bottom-2.5 sm:bottom-4 start-3 sm:start-4 text-sm sm:text-base font-bold text-white tracking-tight">
-            {locale === "ku" ? "پیاوان" : locale === "ar" ? "رجال" : "Men"}
-          </span>
-        </Link>
-
-        {/* Women */}
-        <Link
-          href={href("/shop?gender=women")}
-          className="relative h-[92px] sm:h-[120px] md:h-[140px] lg:h-[160px] rounded-xl sm:rounded-2xl overflow-hidden border border-border group block shadow-xs"
-        >
-          <Image
-            src="/products/skechers-arch-fit-olive.webp"
-            alt="Women"
-            fill
-            sizes="(max-width: 640px) 50vw, 25vw"
-            className="object-cover opacity-60 dark:opacity-55 transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-          <span className="absolute bottom-2.5 sm:bottom-4 start-3 sm:start-4 text-sm sm:text-base font-bold text-white tracking-tight">
-            {locale === "ku" ? "ژنان" : locale === "ar" ? "نساء" : "Women"}
-          </span>
-        </Link>
-
-        {/* Kids / Lifestyle */}
-        <Link
-          href={href("/shop?category=lifestyle")}
-          className="relative h-[92px] sm:h-[120px] md:h-[140px] lg:h-[160px] rounded-xl sm:rounded-2xl overflow-hidden border border-border group block shadow-xs"
-        >
-          <Image
-            src="/products/adidas-runfalcon-black.webp"
-            alt="Kids"
-            fill
-            sizes="(max-width: 640px) 50vw, 25vw"
-            className="object-cover opacity-60 dark:opacity-55 transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-          <span className="absolute bottom-2.5 sm:bottom-4 start-3 sm:start-4 text-sm sm:text-base font-bold text-white tracking-tight">
-            {locale === "ku" ? "منداڵان" : locale === "ar" ? "أطفال" : "Kids"}
-          </span>
-        </Link>
-
-        {/* Sale / Discounts */}
-        <Link
-          href={href("/shop?sale=true")}
-          className="relative h-[92px] sm:h-[120px] md:h-[140px] lg:h-[160px] rounded-xl sm:rounded-2xl overflow-hidden bg-white border border-border flex items-end p-3 sm:p-4 group block shadow-xs"
-        >
-          <div className="absolute top-1 sm:top-2 end-1 sm:end-2 w-14 sm:w-20 h-14 sm:h-20 opacity-90 transition-transform duration-300 group-hover:scale-110">
-            <Image
-              src="/misc/sale-tags.avif"
-              alt="Sale"
-              fill
-              className="object-contain"
-            />
-          </div>
-          <span className="text-sm sm:text-base font-extrabold text-[#0A0A0A] relative z-10">
-            {locale === "ku" ? "داشکاندن" : locale === "ar" ? "تخفيضات" : "Sale"}
-          </span>
-        </Link>
-      </div>
-
-      {/* 3. New Arrivals Header & Horizontal Carousel (Screen 01) */}
-      <div className="space-y-3 pt-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-foreground" />
-            <h2 className="text-base font-bold text-foreground tracking-tight">
-              {locale === "ku"
-                ? "نوێهاتووەکان"
-                : locale === "ar"
-                  ? "وصل حديثاً"
-                  : "New Arrivals"}
-            </h2>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href={href("/new-arrivals")}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {locale === "ku" ? "تەواوی بینینی" : locale === "ar" ? "عرض الكل" : "View all"}
-            </Link>
-
-            <button
-              onClick={() => setSortOpen(true)}
-              className="text-xs font-semibold text-foreground border border-border rounded-full px-3 py-1 flex items-center gap-1.5 hover:bg-secondary transition-colors"
-            >
-              <SlidersHorizontal className="w-3 h-3" />
-              <span>
-                {locale === "ku" ? "ڕیزکردن" : locale === "ar" ? "ترتيب" : "Sort"}
-              </span>
-            </button>
-          </div>
-        </div>
-
-        <NewArrivalsCarousel products={newArrivalList} />
-      </div>
-
-      {/* 4. Full Products Grid (Screen 01, responsive 2 to 4 columns) */}
-      <div className="space-y-4 pt-4 border-t border-border">
-        <div className="flex items-center justify-between pt-1">
-          <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
-            {locale === "ku" ? "هەموو کۆلێکشنەکە" : locale === "ar" ? "كل التشكيلة" : "Full Collection"}
-          </h2>
+      {/* Collection Header: title on the left, pairs count + sort together on the right */}
+      <div className="flex items-center justify-between pt-1 gap-3">
+        <h1 className="text-sm font-bold text-foreground uppercase tracking-wider">
+          {filter === "all"
+            ? locale === "ku"
+              ? "کۆلێکشن"
+              : locale === "ar"
+                ? "التشكيلة"
+                : "Collection"
+            : filterTabs.find((t) => t.id === filter)?.label}
+        </h1>
+        <div className="flex items-center gap-3 shrink-0">
           <span className="text-xs text-muted-foreground">
-            {sortedProducts.length}{" "}
+            {filteredProducts.length}{" "}
             {locale === "ku" ? "جووت" : locale === "ar" ? "زوج" : "pairs"}
           </span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-          {sortedProducts.map((product, idx) => (
-            <ProductCard key={product.slug} product={product} priority={idx < 4} />
-          ))}
+          <button
+            onClick={() => setSortOpen(true)}
+            className="h-8 px-3 rounded-full border border-border bg-card flex items-center gap-1.5 text-xs font-semibold text-foreground hover:bg-secondary transition-colors cursor-pointer"
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
+            <span>{locale === "ku" ? "ڕیزکردن" : locale === "ar" ? "ترتيب" : "Sort"}</span>
+          </button>
         </div>
       </div>
 
-      {/* 5. Official WhatsApp Contact Banner (Screen 01) */}
-      <div className="pt-2">
-        <a
-          href={whatsappContactUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full h-14 bg-card border border-border rounded-xl sm:rounded-2xl flex items-center justify-center gap-3 text-foreground font-bold text-sm hover:bg-secondary transition-all shadow-xs group"
-        >
-          <div className="w-8 h-8 rounded-full bg-[#25D366] flex items-center justify-center text-white shadow-xs transition-transform group-hover:scale-110">
-            <WhatsAppIcon className="w-5 h-5 fill-white" />
-          </div>
-          <span className="text-sm font-bold">
-            {locale === "ku"
-              ? "پەیوەندیمان پێوە بکە لە واتسئاپ"
-              : locale === "ar"
-                ? "تواصل معنا مباشرة عبر واتساب"
-                : "Contact us on WhatsApp"}
-          </span>
-        </a>
+      {/* Full Products Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+        {filteredProducts.map((product, idx) => (
+          <ProductCard key={product.slug} product={product} priority={idx < 4} />
+        ))}
       </div>
 
       {/* Sort Sheet Drawer */}
@@ -234,3 +145,4 @@ export default function StorefrontPage() {
     </div>
   );
 }
+
