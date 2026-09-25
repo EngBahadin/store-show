@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { Logo } from "@/components/brand/logo";
 import { WhatsAppIcon } from "@/components/common/floating-whatsapp";
+import { InstagramIcon } from "@/components/common/instagram-icon";
 import { useI18n } from "@/lib/i18n/provider";
 import { site } from "@/lib/site";
 import { buildContactWhatsAppUrl } from "@/lib/whatsapp";
@@ -66,12 +67,21 @@ export function SiteFooter() {
               {locale === "ku" ? "پەیوەندی و سەردان" : locale === "ar" ? "التواصل والزيارة" : "Contact & Visit"}
             </h3>
             <div className="space-y-2.5 text-xs text-muted-foreground">
-              <div className="flex items-start gap-2">
-                <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0 text-foreground" />
-                <span>
-                  {locale === "ku" ? "سلێمانی" : locale === "ar" ? "السليمانية" : "Sulaymaniyah"}
-                </span>
-              </div>
+              {site.branches.map((branch) => (
+                <a
+                  key={branch.maps}
+                  href={branch.maps}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-2 hover:text-foreground transition-colors"
+                >
+                  <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0 text-foreground" />
+                  <span>
+                    {branch.name[locale]} ·{" "}
+                    {locale === "ku" ? "سلێمانی" : locale === "ar" ? "السليمانية" : "Sulaymaniyah"}
+                  </span>
+                </a>
+              ))}
               <div className="flex items-center gap-2">
                 <Clock className="w-3.5 h-3.5 shrink-0 text-foreground" />
                 <span>{site.hours[locale]}</span>
@@ -80,6 +90,15 @@ export function SiteFooter() {
                 <Phone className="w-3.5 h-3.5 shrink-0 text-foreground" />
                 <span dir="ltr">{site.phone}</span>
               </div>
+              <a
+                href={site.instagram.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 hover:text-foreground transition-colors"
+              >
+                <InstagramIcon className="w-3.5 h-3.5 shrink-0 text-foreground" />
+                <span dir="ltr">@{site.instagram.handle}</span>
+              </a>
               <div className="pt-1">
                 <a
                   href={whatsappContactUrl}

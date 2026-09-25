@@ -1,9 +1,10 @@
 "use client";
 
-import { Clock, MapPin, RefreshCw, Truck } from "lucide-react";
+import { ArrowUpRight, Clock, MapPin, RefreshCw, Truck } from "lucide-react";
 
 import { Logo } from "@/components/brand/logo";
 import { WhatsAppIcon } from "@/components/common/floating-whatsapp";
+import { InstagramIcon } from "@/components/common/instagram-icon";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { useI18n } from "@/lib/i18n/provider";
 import { site } from "@/lib/site";
@@ -125,22 +126,47 @@ export default function InfoPage() {
               </span>
             </div>
 
-            {/* Address */}
-            <div className="p-4 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2 text-muted-foreground shrink-0">
-                <MapPin className="w-4 h-4 text-foreground" />
-                <span>
-                  {locale === "ku"
-                    ? "ناونیشان"
-                    : locale === "ar"
-                      ? "العنوان"
-                      : "Address"}
+            {/* Branches */}
+            {site.branches.map((branch, i) => (
+              <a
+                key={branch.maps}
+                href={branch.maps}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-4 flex items-center justify-between gap-4 hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-center gap-2 text-muted-foreground shrink-0">
+                  <MapPin className="w-4 h-4 text-foreground" />
+                  <span>
+                    {locale === "ku"
+                      ? `لقی ${i + 1}`
+                      : locale === "ar"
+                        ? `الفرع ${i + 1}`
+                        : `Branch ${i + 1}`}
+                  </span>
+                </div>
+                <span className="text-foreground text-end font-medium inline-flex items-center gap-1">
+                  {branch.name[locale]}
+                  <ArrowUpRight className="w-3 h-3 shrink-0" />
                 </span>
+              </a>
+            ))}
+
+            {/* Instagram */}
+            <a
+              href={site.instagram.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <InstagramIcon className="w-4 h-4 text-foreground" />
+                <span>Instagram</span>
               </div>
-              <span className="text-foreground text-end font-medium">
-                {site.address[locale]}
+              <span className="text-foreground font-semibold" dir="ltr">
+                @{site.instagram.handle}
               </span>
-            </div>
+            </a>
 
             {/* Hours */}
             <div className="p-4 flex items-center justify-between">

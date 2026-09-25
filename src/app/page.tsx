@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import { defaultLocale, isLocale, matchLocale } from "@/lib/i18n/config";
+import { defaultLocale, isLocale } from "@/lib/i18n/config";
 
 export default function RootPage() {
   const router = useRouter();
@@ -17,11 +17,10 @@ export default function RootPage() {
         router.replace(`/${savedLocale}/`);
         return;
       }
-      const matched = matchLocale(navigator.languages || [navigator.language]);
-      router.replace(`/${matched}/`);
     } catch {
-      router.replace(`/${defaultLocale}/`);
+      // localStorage unavailable — fall through to the default locale.
     }
+    router.replace(`/${defaultLocale}/`);
   }, [router]);
 
   return (

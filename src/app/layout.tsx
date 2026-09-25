@@ -18,9 +18,9 @@ export default function RootLayout({
     <html
       lang="ckb"
       dir="rtl"
-      className="dark"
+      className="light"
       suppressHydrationWarning
-      style={{ colorScheme: "dark" }}
+      style={{ colorScheme: "light" }}
     >
       <head>
         {/* Instant direction and language synchronizer before first paint to prevent layout flip */}
